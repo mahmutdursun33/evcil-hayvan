@@ -1,0 +1,303 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+/* run this program using the console pauser or add your own getch, system("pause") or input loop */
+struct EvcilHayvan {
+    char tur[20];//turu
+    char ad[20];
+    int enerji;
+    int mutluluk;
+    char duygu[20];
+};
+
+
+void ekle(struct EvcilHayvan hayvan) {
+    FILE *dosya;
+    struct EvcilHayvan mevcutHayvan;
+
+	char string[]="evcil_veri.txt";
+	
+	//dosya okuma ve ekleme
+    dosya = fopen(string, "r+");
+    if (dosya != NULL) {
+        int ayniIsimVar = 0;
+
+        // Dosyanın sonuna git
+        fseek(dosya, 0, SEEK_END);
+
+        // Dosyayı baştan oku ve aynı isimde hayvanın olup olmadığını kontrol et
+        rewind(dosya);
+        while (fscanf(dosya, "%s %s %d %d", mevcutHayvan.ad, mevcutHayvan.tur, &mevcutHayvan.enerji, &mevcutHayvan.mutluluk) == 4) {
+            if (strcmp(mevcutHayvan.ad, hayvan.ad) == 0) {
+                ayniIsimVar = 1;
+                break;
+            }
+        }
+
+        if (ayniIsimVar) {
+            printf("Bu isimde bir hayvan zaten mevcut!\n");
+        } else {
+            // Dosyanın sonuna yeni hayvanı ekle
+            fprintf(dosya, "%s %s %d %d\n", hayvan.ad, hayvan.tur, hayvan.enerji, hayvan.mutluluk);
+            printf("Yeni evcil hayvan eklendi!\n");
+        }
+
+        fclose(dosya);
+    } else {
+        printf("Dosya acilamadi!\n");
+    }
+}
+
+void evcilHayvanIsimDegistir(const char* eskiAd, const char* yeniAd) {
+    FILE* dosya;
+    FILE* geciciDosya;
+   struct EvcilHayvan hayvan;
+
+    dosya = fopen("evcil_veri.txt", "r");
+    if (dosya == NULL) {
+        printf("Dosya acilamadi!\n");
+        return;
+    }
+
+    geciciDosya = fopen("gecici_veri.txt", "w");
+    if (geciciDosya == NULL) {
+        printf("Gecici dosya olusturulamadi!\n");
+        fclose(dosya);
+        return;
+    }
+
+    int hayvanBulundu = 0;
+
+    while (fscanf(dosya, "%s %s %d %d", hayvan.ad, hayvan.tur, &hayvan.enerji, &hayvan.mutluluk) == 4) {
+        if (strcmp(hayvan.ad, eskiAd) == 0) {
+            hayvanBulundu = 1;
+            strcpy(hayvan.ad, yeniAd); // Yeni ismi atama
+        }
+
+        fprintf(geciciDosya, "%s %s %d %d\n", hayvan.ad, hayvan.tur, hayvan.enerji, hayvan.mutluluk);
+    }
+
+    fclose(dosya);
+    fclose(geciciDosya);
+
+    if (!hayvanBulundu) {
+        printf("Belirtilen isimde bir evcil hayvan bulunamadi!\n");
+        remove("gecici_veri.txt");
+        return;
+    }
+
+    if (remove("evcil_veri.txt") != 0) {
+        printf("Evcil hayvan dosyasi silinirken hata olustu!\n");
+        return;
+    }
+
+    if (rename("gecici_veri.txt", "evcil_veri.txt") != 0) {
+        printf("Evcil hayvan dosyasi yeniden adlandirilirken hata olustu!\n");
+        return;
+    }
+
+    printf("Evcil hayvanin ismi basariyla degistirildi!\n");
+}
+
+
+void evcilHayvanSil(const char* ad) {
+    FILE* dosya;
+    FILE* geciciDosya;
+  struct EvcilHayvan hayvan;
+
+//dosyayı oku
+    dosya = fopen("evcil_veri.txt", "r");
+    if (dosya == NULL) {
+        printf("Dosya acilamadi!\n");
+        return;
+    }
+
+    geciciDosya = fopen("gecici_veri.txt", "w");
+    if (geciciDosya == NULL) {
+        printf("Gecici dosya olusturulamadi!\n");
+        fclose(dosya);
+        return;
+    }
+
+    int hayvanBulundu = 0;
+
+    while (fscanf(dosya, "%s %s %d %d", hayvan.ad, hayvan.tur, &hayvan.enerji, &hayvan.mutluluk) == 4) {
+        if (strcmp(hayvan.ad, ad) == 0) {
+            hayvanBulundu = 1;
+            continue; 
+        }
+
+        fprintf(geciciDosya, "%s %s %d %d\n", hayvan.ad, hayvan.tur, hayvan.enerji, hayvan.mutluluk);
+    }
+
+    fclose(dosya);
+    fclose(geciciDosya);
+
+    if (!hayvanBulundu) {
+        printf("Belirtilen isimde bir evcil hayvan bulunamadi!\n");
+        remove("gecici_veri.txt");
+        return;
+    }
+
+    if (remove("evcil_veri.txt") != 0) {
+        printf("Evcil hayvan dosyasi silinirken hata olustu!\n");
+        return;
+    }
+
+    if (rename("gecici_veri.txt", "evcil_veri.txt") != 0) {
+        printf("Evcil hayvan dosyasi yeniden adlandirilirken hata olustu!\n");
+        return;
+    }
+
+    printf("Evcil hayvan basariyla silindi!\n");
+}
+
+void duygu(struct EvcilHayvan hayvan)
+{
+	FILE *dosya1;
+    struct EvcilHayvan mevcutHayvan;
+	char string2[]="duygu.txt";
+	
+	//dosya okuma ve ekleme
+    dosya1 = fopen(string2, "a");
+   if (dosya1 == NULL) {
+        printf("Dosya acilamadi.");
+        return;
+    }
+    else{
+		int t=0;	
+    	    if(t<1){fprintf(dosya1,"%s\n", hayvan.ad); t=2;}
+			if(hayvan.enerji>25 && hayvan.mutluluk>50) fprintf(dosya1,":)");
+			if(10<hayvan.enerji<20 && 10<hayvan.mutluluk<20) fprintf(dosya1,":(");
+			if(5<hayvan.enerji<10 && 5<hayvan.mutluluk<10) fprintf(dosya1,":’( ");
+			if(hayvan.enerji<5) fprintf(dosya1,"Zzz");
+			if(10<hayvan.enerji<20) fprintf(dosya1,":-o <");
+			if(50>hayvan.enerji>40 && 20<hayvan.mutluluk<30) fprintf(dosya1,"<:o)");
+    fclose(dosya1);
+	}
+}
+
+int main(int argc, char *argv[]) {
+	
+		struct EvcilHayvan evcil;
+	
+		evcil.enerji=60;
+		evcil.mutluluk=60;
+		
+		//for döngüsü eklenecek 3 defa
+		printf("Evcil hayvanin adini girin: ");
+    scanf("%s", evcil.ad);
+    printf("evcil hayvanın turunu girin");
+    scanf("%s",evcil.tur);
+    
+
+	baslangic:
+	printf("hayvanı besle 1\n");
+	printf("hayvana su ver2\n");
+	printf("hayvanla oyun oyna 3\n");
+	printf("hayvanı temizle 4\n");
+	printf("hayvanı sev 5\n");
+	printf("hayvanı uyut 6\n");
+	printf("hayvana ödül ver 7\n");
+	printf("cikmak icin 8 e bas\n");
+	int sayi;
+	if(evcil.enerji<5)
+	{
+		printf("hayvanı uyutmalısınız cunku enerjisi kalmadı (6 ya bas uyut)\n");
+		scanf("%d", &sayi);
+
+  			do {
+        	scanf("%d", &sayi);
+    	} while (sayi != 6);	
+	}
+	
+	
+	if(evcil.mutluluk<5)
+	{
+		printf("hayvanın mutlu olması lazım (7,6,5,3,2,1 e bas )");
+		
+				do {
+        	scanf("%d", &sayi);
+    	} while (sayi != 6 && sayi != 7 && sayi != 5 && sayi != 3 && sayi != 2 && sayi != 1);
+    
+	}
+	
+	scanf("%d",&sayi);
+	duygu(evcil);
+			
+	 switch (sayi) {
+        case 1:
+		evcil.enerji+=15;
+		evcil.mutluluk+=10;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 2:
+		evcil.enerji+=5;
+		evcil.mutluluk+=5;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 3://oyun oyna
+		evcil.enerji-=15;
+		evcil.mutluluk+=15;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 4://temizle
+		evcil.enerji-=10;
+		evcil.mutluluk-=5;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 5://sev
+		evcil.enerji+=0;
+		evcil.mutluluk+=5;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 6://UYUT
+		evcil.enerji+=5;
+		evcil.mutluluk+=0;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+		case 7://ödül ver
+		evcil.enerji+=0;
+		evcil.mutluluk+=10;
+		printf("enerji seviyesi %d\n",evcil.enerji);
+		printf("mutluluk seviyesi %d\n",evcil.mutluluk);
+		goto baslangic;
+    }
+	ekle(evcil);
+	int bas;
+		char eskiAd[50];
+    char yeniAd[50];
+    	char silinecekAd[50];
+    	
+	printf("evcil hayvanı guncellemek icin 1 e bas\n");
+	printf("evcil hayvanı silmek icin 2 ye bas\n");
+	scanf("%d",&bas);
+	switch(bas)
+	{
+		case 1:
+	//hayvan güncelleme
+
+	printf("Ismi degistirilecek evcil hayvanin mevcut adini girin:\n");
+    scanf("%s", eskiAd);
+    printf("Yeni adi girin:\n ");
+    scanf("%s", yeniAd);
+    evcilHayvanIsimDegistir(eskiAd, yeniAd);
+    break;
+    
+    	case 2:
+    		//hayvan silme
+
+
+    printf("Silmek istediginiz evcil hayvanin adini girin:\n ");
+    scanf("%s", silinecekAd);
+
+    evcilHayvanSil(silinecekAd);
+    
+	}
+}
